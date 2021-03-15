@@ -15,7 +15,7 @@ jobs:
           path: /go/src/github.com/ep4eg/babbler/babbler
           destination: babbler
       - save_cache:
-          key: bin
+          key: bin-{{ .BuildNum }}
           paths:
             - ./bin
   release:
@@ -28,7 +28,7 @@ jobs:
           version: 19.03.13
           docker_layer_caching: false
       - restore_cache:
-          key: bin
+          key: bin-{{ .BuildNum }}
       - run:
           name: Building image
           command: |
