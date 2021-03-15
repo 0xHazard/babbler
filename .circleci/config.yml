@@ -12,7 +12,7 @@ jobs:
           name: Building app
           command: CGO_ENABLED=0 go build -o babbler ./cmd/babbler/
       - store_artifacts:
-          path: /go/src/github.com/ep4eg/babbler
+          path: /go/src/github.com/ep4eg/babbler/babbler
   release:
     docker:
       - image: docker:19.03.13
@@ -28,3 +28,9 @@ jobs:
                   docker build -t ep4eg/babbler:$TAG .
                   echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                   docker push ep4eg/babbler:$
+workflows:
+  version: 2
+  build_and_release:
+    jobs:
+      - build
+      - release
