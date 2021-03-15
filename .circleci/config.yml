@@ -10,14 +10,14 @@ jobs:
       - checkout
       - run:
           name: Building app
-          command: CGO_ENABLED=0 go build -o babbler ./cmd/babbler/
+          command: mkdir ./bin && CGO_ENABLED=0 go build -o ./bin/babbler ./cmd/babbler/
       - store_artifacts:
           path: /go/src/github.com/ep4eg/babbler/babbler
           destination: babbler
       - save_cache:
-        key: babbler-bin
+        key: bin
         paths:
-          - ./babbler
+          - ./bin
   release:
     docker:
       - image: docker:19.03
@@ -28,7 +28,7 @@ jobs:
           version: 19.03.13
           docker_layer_caching: false
       - restore_cache:
-        key: babbler-bin
+        key: bin
       - run:
           name: Building image
           command: |

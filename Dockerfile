@@ -1,3 +1,3 @@
 FROM alpine:3.8
-COPY babbler /usr/local/bin/babbler
+COPY ./bin/babbler /usr/local/bin/babbler
 ENTRYPOINT ["/usr/local/bin/babbler"]
