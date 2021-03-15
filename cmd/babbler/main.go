@@ -35,7 +35,7 @@ func main() {
 
 	Logger.SetOutput(&logutils.LevelFilter{
 		Levels:   []logutils.LogLevel{"DEBUG", "INFO", "WARN", "ERROR"},
-		MinLevel: logutils.LogLevel("INFO"),
+		MinLevel: logutils.LogLevel("DEBUG"),
 		Writer:   os.Stdout,
 	})
 
@@ -95,6 +95,7 @@ func main() {
 				continue
 			}
 			rtt := time.Now().UnixNano() - msg.Time
+			config.Logger.Printf("[DEBUG] time now: %v, in message: %v", time.Now().UnixNano(), msg.Time)
 			updateRTT("tcp", msg.From, msg.To, rtt)
 			config.Logger.Printf("[INFO] (TCP) From: %q , To: %q, RTT: %dns", msg.From, msg.To, rtt)
 		}
