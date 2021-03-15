@@ -32,7 +32,9 @@ jobs:
                   docker push ep4eg/babbler:$
 workflows:
   version: 2
-  build_and_release:
+  build:
     jobs:
       - build
+  release:
+    jobs:
       - release
