@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/hashicorp/logutils"
@@ -14,7 +13,7 @@ import (
 
 var (
 	localAddr, location, remoteAddr string
-	localPort                       int
+	localPort, mport                int
 	checkInterval                   int64
 )
 
@@ -26,6 +25,7 @@ func init() {
 	flag.StringVar(&remoteAddr, "bootstrap", "", "remote host to bootstrap. Can be multiple comma-separated hosts")
 	flag.StringVar(&localAddr, "addr", "0.0.0.0", "local address")
 	flag.IntVar(&localPort, "port", 7964, "local port")
+	flag.IntVar(&mport, "mport", 8080, "metrics port")
 	flag.Int64Var(&checkInterval, "interval", 3, "checks interval")
 	flag.StringVar(&location, "location", "local", "host location / datacenter")
 	flag.Parse()
@@ -80,7 +80,7 @@ func main() {
 		case <-config.Delegate.(*msgController).interval.C:
 			for _, member := range list.Members() {
 				if member.Addr.String() != localAddr {
-					msg, err := newMessage(localAddr, member.Addr.String(), timeNow())
+					msg, err := newMessage(localAddr, member.Addr.String(), time.Now().UnixNano())
 					if err != nil {
 						config.Logger.Printf("[ERROR] %v", err)
 						continue
@@ -94,14 +94,9 @@ func main() {
 				config.Logger.Printf("[ERROR] couldn't parse message, %v", err)
 				continue
 			}
-			ts, err := strconv.ParseInt(string(msg.Time), 10, 64)
-			if err != nil {
-				config.Logger.Printf("[ERROR] coudn't get timestamp, %v", err)
-				continue
-			}
-			rtt := time.Since(time.Unix(0, ts))
-			updateRTT("tcp", msg.From, msg.To, rtt.Nanoseconds())
-			config.Logger.Printf("[INFO] (TCP) From: %q , To: %q, RTT: %q", msg.From, msg.To, rtt)
+			rtt := time.Now().UnixNano() - msg.Time
+			updateRTT("tcp", msg.From, msg.To, rtt)
+			config.Logger.Printf("[INFO] (TCP) From: %q , To: %q, RTT: %dns", msg.From, msg.To, rtt)
 		}
 	}
 

@@ -61,12 +61,12 @@ func (c *msgController) MergeRemoteState(buf []byte, join bool) {
 type message struct {
 	From     string `json:"from"`
 	To       string `json:"to"`
-	Time     string `json:"timestamp"`
+	Time     int64  `json:"timestamp"`
 	Location string `json:"location"`
 }
 
-func newMessage(from, to, ts string) ([]byte, error) {
-	if from == "" || to == "" || ts == "" {
+func newMessage(from, to string, ts int64) ([]byte, error) {
+	if from == "" || to == "" || ts == 0 {
 		return nil, fmt.Errorf("input arguments can't be empty")
 	}
 	m := message{
