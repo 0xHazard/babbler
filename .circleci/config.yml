@@ -15,11 +15,11 @@ jobs:
           path: /go/src/github.com/ep4eg/babbler/babbler
   release:
     docker:
-      - image: docker:19.03.13
+      - image: docker:19.03
     working_directory: /go/src/github.com/ep4eg/babbler
     steps:
       - setup_remote_docker:
-          version: 19.03
+          version: 19.03.13
           docker_layer_caching: false
       - run:
           name: Building image
