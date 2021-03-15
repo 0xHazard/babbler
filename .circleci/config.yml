@@ -8,13 +8,27 @@ jobs:
     working_directory: /go/src/github.com/ep4eg/babbler
     steps:
       - checkout
-
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_caching: true
       - run:
           name: Building app
-          command: go build -o babbler ./cmd/babbler/
+          command: mkdir ./bin && CGO_ENABLED=0 go build -o ./bin/babbler ./cmd/babbler/
+      - store_artifacts:
+          path: /go/src/github.com/ep4eg/babbler/babbler
+          destination: babbler
+      - save_cache:
+          key: bin
+          paths:
+            - ./bin
+  release:
+    docker:
+      - image: docker:19.03
+    working_directory: /go/src/github.com/ep4eg/babbler
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: false
+      - restore_cache:
+          key: bin
       - run:
           name: Building image
           command: |
@@ -22,3 +36,12 @@ jobs:
                   docker build -t ep4eg/babbler:$TAG .
                   echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                   docker push ep4eg/babbler:$TAG
+                  docker logout
+workflows:
+  version: 2
+  build_and_release:
+    jobs:
+      - build
+      - release:
+          requires:
+            - build
